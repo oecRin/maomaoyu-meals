@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>今天吃什么 · 猫猫鱼</title>
+  <meta name="description" content="转一转木头转盘，决定今天吃什么。常见三餐菜单，也能保存自己的口味。">
+  <meta name="theme-color" content="#f4eadb">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='34' r='26' fill='%23a9703d'/%3E%3Cpath d='M32 8v52M6 34h52M14 16l36 36M14 52l36-36' stroke='%23e8cba0' stroke-width='2'/%3E%3Cpath d='M25 2h14l-7 17z' fill='%23b8422c'/%3E%3Ccircle cx='32' cy='34' r='7' fill='%23e8cba0'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css"><script src="app.js" defer></script>
+</head>
+<body>
+<div class="page">
+  <header><a class="brand" href="./" aria-label="猫猫鱼首页"><span class="brand-mark">魚</span><span>猫猫鱼<span class="brand-small">一日三餐，好好吃饭</span></span></a><span class="domain">猫猫鱼.icu</span></header>
+  <main>
+    <section class="intro"><p class="eyebrow">今天的难题，交给转盘</p><h1>今天吃<span>什么</span>？</h1><p class="subtitle">不用纠结，转到哪道吃哪道。</p></section>
+    <nav class="meal-tabs" aria-label="选择餐次"><button data-meal="breakfast">早餐</button><button data-meal="lunch" class="active">午餐</button><button data-meal="dinner">晚餐</button></nav>
+    <div class="workspace">
+      <section class="wheel-section" aria-label="食物转盘">
+        <div class="wheel-wrap"><div class="pointer" aria-hidden="true"></div><canvas id="wheel" width="1000" height="1000" role="img" aria-label="食物转盘，候选食物见菜单列表"></canvas><div class="axle" aria-hidden="true"><span>吃</span></div></div>
+        <div class="wheel-caption"><span class="small-line"></span><span id="wheel-caption">让好吃的，自己转过来</span><span class="small-line"></span></div>
+        <button id="spin" class="primary spin-button">转一转，开饭！<span aria-hidden="true">↻</span></button>
+        <p class="round-info" id="round-info" aria-live="polite"></p>
+        <button id="reset-round" class="text-button" hidden>重新开始本轮</button>
+      </section>
+      <section class="menu-panel" aria-label="食物菜单">
+        <div class="panel-top"><div><p class="eyebrow">先选菜单，再听天意</p><h2>这顿吃点好的</h2></div><span id="count" class="count">12 道</span></div>
+        <div class="source-tabs" aria-label="菜单来源"><button data-source="public" class="active">院长菜单</button><button data-source="personal">我的菜单</button></div>
+        <p id="source-note" class="menu-note">院长准备的常见吃食，不想吃的取消勾选就好。</p>
+        <div id="food-list" class="food-list"></div>
+        <div class="menu-actions"><button id="select-all" class="text-button">全部勾选</button><button id="edit-menu" class="text-button emphasis">复制并编辑我的菜单</button></div>
+        <div class="menu-bottom"><label class="check-label"><input id="avoid-repeat" type="checkbox" checked>尽量不连续抽中同一道</label><p>点「换一个」，这道本轮就不再出现。</p></div>
+      </section>
+    </div>
+  </main>
+  <footer><span>好好吃饭，是今天的正经事。</span><span>猫猫鱼 · 今日食签</span></footer>
+</div>
+<dialog id="result-dialog" class="result-dialog" aria-labelledby="result-title">
+ <button class="close" id="close-result" aria-label="关闭结果">×</button>
+ <div class="receipt"><p class="eyebrow">猫猫鱼 · 今日食签</p><p class="ticket-date" id="ticket-date"></p><div class="dashed"></div><p id="result-title">今天就吃</p><h2 id="result-food"></h2><p id="result-comment">纠结到此为止，快乐从这顿开始。</p><div class="dashed"></div><p class="ticket-bottom">宜：好好吃饭 &nbsp; 忌：饿着肚子纠结</p></div>
+ <div class="result-buttons"><button id="accept" class="primary">就吃这个</button><button id="reject" class="secondary">换一个</button></div>
+</dialog>
+<dialog id="edit-dialog" class="edit-dialog" aria-labelledby="edit-title">
+ <button class="close" id="close-edit" aria-label="关闭菜单编辑">×</button><p class="eyebrow">按自己的口味来</p><h2 id="edit-title">我的午餐菜单</h2><p class="menu-note">修改只保存在此浏览器，不影响其他人的菜单。</p>
+ <form id="add-form"><label class="sr-only" for="food-name">食物或店名</label><input id="food-name" placeholder="添加食物或店名" maxlength="20" autocomplete="off" required><button class="primary" type="submit">添加</button></form>
+ <div id="edit-list" class="edit-list"></div><p class="menu-note">最多 40 项，每项最多 20 个字。修改后自动保存。</p><button id="done-edit" class="primary full">好了，去转转</button>
+</dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body></html>
