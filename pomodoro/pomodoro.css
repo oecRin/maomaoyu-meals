@@ -1,0 +1,68 @@
+@font-face{font-family:"MaShanCard";src:url(../fonts/mashan-subset.woff2) format("woff2");unicode-range:U+30-39;font-display:swap}
+:root{--paper:#f8f1e3;--ink:#392e25;--muted:#817467;--line:#d9cbbb;--red:#a43e2d;--red-dark:#813022;font-family:ui-sans-serif,system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:#22170f radial-gradient(ellipse at center,#3a2718,#170f09);display:grid;place-items:center;min-height:100dvh}
+button,input{font:inherit;color:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.stage{position:relative;width:min(100vw,177.78dvh);aspect-ratio:16/9;overflow:hidden;container-type:inline-size;box-shadow:0 20px 80px #000a}
+.room{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated;user-select:none}
+/* 叠加层全部用 % 定位（底图 1280x720 坐标 / 1280 或 / 720） */
+.tomato{position:absolute;left:38.36%;top:60.83%;width:4.375%;height:7.778%;image-rendering:pixelated;pointer-events:none}
+.rain{position:absolute;left:85%;top:0;width:15%;height:48.6%;pointer-events:none;mix-blend-mode:screen;opacity:.75}
+.window-tint{position:absolute;left:85%;top:0;width:15%;height:48.6%;background:#5a7bd8;mix-blend-mode:soft-light;opacity:0;transition:opacity 2s;pointer-events:none}
+.lamp-glow{position:absolute;left:36%;top:28%;width:22%;height:40%;background:radial-gradient(closest-side,#ffd88a66,#ffb25022 55%,transparent);mix-blend-mode:screen;pointer-events:none;animation:glow 5s ease-in-out infinite;transition:opacity 2s}
+@keyframes glow{50%{opacity:.7;transform:scale(.97)}}
+.lights i{position:absolute;width:1.4%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(closest-side,#fff3c4,#ffd36a88 45%,transparent);mix-blend-mode:screen;animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{50%{opacity:.25}}
+.steam{position:absolute;left:45.6%;top:57.5%;width:4%;height:9%;pointer-events:none}
+.steam i{position:absolute;bottom:0;left:40%;width:22%;height:45%;border-radius:50%;background:#fff;opacity:0;filter:blur(2px);animation:steam 3.6s ease-out infinite}
+.steam i:nth-child(2){left:20%;animation-delay:1.2s}.steam i:nth-child(3){left:58%;animation-delay:2.4s}
+@keyframes steam{0%{opacity:0;transform:translateY(0) scaleX(1)}25%{opacity:.35}100%{opacity:0;transform:translateY(-120%) scaleX(1.6)}}
+.cat-breath{position:absolute;inset:0;background:url(room.webp) 0 0/100% 100%;image-rendering:pixelated;clip-path:ellipse(7.4% 6.4% at 30.4% 82.4%);transform-origin:30% 89%;animation:breath 4.2s ease-in-out infinite;pointer-events:none}
+@keyframes breath{50%{transform:scaleY(1.018) scaleX(1.006)}}
+.stage.break .lamp-glow{opacity:.35}.stage.break .window-tint{opacity:.45}
+@media(prefers-reduced-motion:reduce){.lamp-glow,.lights i,.steam i,.cat-breath{animation:none}.steam{display:none}}
+/* 面板：桌面放在画面左侧留白里 */
+.panel{position:absolute;left:0;top:0;width:28.5%;height:100%;padding:2.2cqw 1.8cqw 1.6cqw 2.4cqw;display:flex;flex-direction:column;gap:1.1cqw;font-size:clamp(11px,1.1cqw,16px)}
+.top{display:flex;justify-content:space-between;align-items:center}
+.back{color:var(--muted);text-decoration:none;font-size:1em}.back:hover{color:var(--red)}
+.icon{border:0;background:none;font-size:1.4em;color:var(--muted);padding:2px 6px}
+.settings{position:absolute;z-index:5;top:4cqw;right:1.4cqw;background:#fffdf8;border:1px solid var(--line);box-shadow:4px 4px 0 #e8dece;padding:12px 14px;display:grid;gap:8px;width:min(220px,90%)}
+.settings[hidden]{display:none}.settings p{margin:0;font-size:.9em;color:var(--muted)}.settings .hint{font-size:.8em}
+.settings label{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.settings input{width:5.5em;padding:4px 6px;border:1px solid var(--line);background:#fff}
+.eyebrow{margin:0;font-size:.85em;letter-spacing:2px;color:var(--muted)}
+.modes{display:flex;gap:4px}
+.modes button{flex:1;border:0;background:transparent;padding:.55em 0;border-radius:3px;font-size:.95em;white-space:nowrap}
+.modes button.active{background:var(--ink);color:#fff9ed;box-shadow:0 3px 0 #c6b7a3}
+.time{font-family:"MaShanCard","Songti SC",SimSun,serif;font-size:7.2cqw;line-height:1;text-align:center;color:var(--ink);letter-spacing:.02em;font-variant-numeric:tabular-nums;margin-top:.4cqw}
+.stage.break .time{color:#4f6e8f}
+.status{margin:0;text-align:center;font-size:.9em;color:var(--muted);min-height:1.4em}
+.controls{display:grid;grid-template-columns:1.4fr 1fr;gap:8px}
+.primary{background:var(--red);color:#fff9f0;border:1px solid var(--red);border-radius:4px;font-weight:600;padding:.7em 1em;box-shadow:0 3px 0 #7d3124}
+.primary:hover{background:var(--red-dark)}.primary:active{transform:translateY(2px)}
+.secondary{border:1px solid #c7b9a7;background:transparent;padding:.7em;border-radius:4px}
+.today{display:flex;align-items:center;gap:10px;font-size:.9em;color:var(--muted);border-top:1px dashed var(--line);padding-top:.9cqw;min-height:2.4em}
+.stamps{display:flex;flex-wrap:wrap;gap:4px}
+.stamps i{width:1.7em;height:1.7em;border:2px solid var(--red);color:var(--red);font-style:normal;font-size:.75em;display:grid;place-items:center;transform:rotate(-8deg);font-family:"Songti SC",SimSun,serif;opacity:.85}
+.stamps i:nth-child(even){transform:rotate(6deg)}
+.todo{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px}
+#todo-form{display:flex;gap:6px}
+#todo-input{flex:1;min-width:0;border:1px solid var(--line);background:#fffdf8;padding:.55em .7em;border-radius:3px}
+#todo-form .primary{padding:.5em .8em;box-shadow:none}
+#todo-list{list-style:none;margin:0;padding:0;overflow:auto;flex:1}
+#todo-list li{display:flex;align-items:center;gap:8px;padding:.45em 0;border-bottom:1px solid #ece1d2}
+#todo-list input{accent-color:var(--red);width:1.1em;height:1.1em;margin:0;flex:none}
+#todo-list span{flex:1;overflow-wrap:anywhere}
+#todo-list li.done span{text-decoration:line-through;color:#a39482}
+#todo-list button{border:0;background:none;color:var(--red);font-size:.9em;padding:2px 4px}
+.empty{color:var(--muted);font-size:.85em;padding:.6em 0}
+.scene{position:absolute;inset:0}
+/* 手机：画面在上，面板在下 */
+@media(max-width:760px){body{display:block;background:var(--paper)}
+ .stage{width:100%;aspect-ratio:auto;overflow:visible;box-shadow:none;container-type:normal}
+ .scene{position:relative;aspect-ratio:16/9;overflow:hidden}
+ .panel{position:relative;width:auto;height:auto;padding:16px 20px 30px;gap:12px;font-size:15px}
+ .time{font-size:64px}.today{padding-top:12px}.settings{top:44px;right:16px}#todo-list{overflow:visible}
+}
