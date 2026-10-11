@@ -24,15 +24,15 @@ function drawTomato(frac){tg.clearRect(0,0,56,56);const cx=28,cy=28,R=26;
  tg.fillStyle='#2b201a';tg.fillRect(cx-2,cy-2,4,4);}
 
 /* ---- UI ---- */
-let lastFrac=-1;
+let lastFrac=-1,shownDone=-1;
 function render(){const ms=remaining(),t=fmt(ms);$('#time').textContent=t;document.title=(running()?t+' · ':'')+MODES[S.mode]+' · 番茄钟';
- const frac=1-ms/total();if(Math.abs(frac-lastFrac)>.0005){lastFrac=frac;drawTomato(Math.min(1,Math.max(0,frac)));}
+ const frac=1-ms/total();$('#ring').style.strokeDasharray=(Math.min(1,Math.max(0,frac))*100).toFixed(2)+' 100';if(Math.abs(frac-lastFrac)>.0005){lastFrac=frac;drawTomato(Math.min(1,Math.max(0,frac)));}
 }
 function renderStatic(){document.querySelectorAll('[data-mode]').forEach(b=>{const on=b.dataset.mode===S.mode;b.classList.toggle('active',on);b.setAttribute('aria-selected',on);});
  document.querySelectorAll('[data-min]').forEach(s=>s.textContent=+S.minutes[s.dataset.min].toFixed(1));
  $('#start').textContent=running()?'暂停':(S.left!==null&&S.left<total()?'继续':'开始');
  $('#stage').classList.toggle('break',S.mode!=='focus');
- const st=$('#stamps');st.replaceChildren();for(let i=0;i<Math.min(S.done,24);i++){const s=document.createElement('i');s.textContent='茄';st.append(s);}if(S.done>24){const s=document.createElement('b');s.textContent='×'+S.done;st.append(s);}st.setAttribute('aria-label','今日完成 '+S.done+' 个');if(!S.done){const e=document.createElement('span');e.textContent='还没有，开始第一个吧';st.append(e);}
+ if(shownDone!==S.done){shownDone=S.done;const st=$('#stamps');st.replaceChildren();const NS='http://www.w3.org/2000/svg';for(let i=0;i<Math.min(S.done,16);i++){const s=document.createElementNS(NS,'svg'),u=document.createElementNS(NS,'use');u.setAttribute('href','#i-tomato');s.append(u);s.style.animationDelay=(i*.04)+'s';st.append(s);}if(S.done>16){const s=document.createElement('b');s.textContent='×'+S.done;st.append(s);}st.setAttribute('aria-label','今日完成 '+S.done+' 个');if(!S.done){const e=document.createElement('span');e.className='none';e.textContent='还没有，开始第一个吧';st.append(e);}}
  lastFrac=-1;render();}
 function setStatus(t){$('#status').textContent=t;}
 function setMode(m){S.mode=m;S.endAt=null;S.left=null;persist();renderStatic();setStatus(m==='focus'?'准备好就开始吧':'喝口茶，摸摸猫');}
@@ -53,7 +53,7 @@ sb.onclick=e=>{e.stopPropagation();sp.hidden=!sp.hidden;sb.setAttribute('aria-ex
 document.addEventListener('click',e=>{if(!sp.hidden&&!sp.contains(e.target)&&e.target!==sb){sp.hidden=true;sb.setAttribute('aria-expanded','false');}});
 for(const k in MODES){const inp=$('#set-'+k);inp.value=S.minutes[k];inp.onchange=()=>{const v=+inp.value;if(!(v>0&&v<=180)){inp.value=S.minutes[k];return;}S.minutes[k]=v;if(k===S.mode&&!running())S.left=null;persist();renderStatic();};}
 /* 待办 */
-function renderTodos(){const ul=$('#todo-list');ul.replaceChildren();S.todos.forEach((t,i)=>{const li=document.createElement('li');li.classList.toggle('done',t.done);const c=document.createElement('input');c.type='checkbox';c.checked=t.done;c.setAttribute('aria-label','完成 '+t.text);c.onchange=()=>{t.done=c.checked;persist();renderTodos();};const s=document.createElement('span');s.textContent=t.text;const d=document.createElement('button');d.textContent='删除';d.setAttribute('aria-label','删除 '+t.text);d.onclick=()=>{S.todos.splice(i,1);persist();renderTodos();};li.append(c,s,d);ul.append(li);});if(!S.todos.length){const li=document.createElement('li');li.className='empty';li.textContent='写下这轮想做的小事。';ul.append(li);}}
+function renderTodos(){const ul=$('#todo-list');ul.replaceChildren();S.todos.forEach((t,i)=>{const li=document.createElement('li');li.classList.toggle('done',t.done);const c=document.createElement('input');c.type='checkbox';c.checked=t.done;c.setAttribute('aria-label','完成 '+t.text);c.onchange=()=>{t.done=c.checked;persist();renderTodos();};const s=document.createElement('span');s.textContent=t.text;const d=document.createElement('button');d.textContent='✕';d.setAttribute('aria-label','删除 '+t.text);d.onclick=()=>{S.todos.splice(i,1);persist();renderTodos();};li.append(c,s,d);ul.append(li);});if(!S.todos.length){const li=document.createElement('li');li.className='empty';li.textContent='写下这轮想做的小事。';ul.append(li);}}
 $('#todo-form').onsubmit=e=>{e.preventDefault();const v=$('#todo-input').value.trim();if(!v)return;S.todos.push({text:v,done:false});$('#todo-input').value='';persist();renderTodos();};
 /* 提示音（WebAudio 现场合成） */
 let ac=null;function unlockAudio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch{}}
@@ -66,5 +66,9 @@ LIGHTS.forEach(([x,y],i)=>{const l=document.createElement('i');l.style.left=x+'%
 const rc=$('#rain'),rg=rc.getContext('2d');const drops=Array.from({length:70},()=>({x:Math.random()*220,y:Math.random()*350,v:4+Math.random()*4,l:5+Math.random()*7}));
 function rain(){rg.clearRect(0,0,192,350);rg.strokeStyle='#bcd3ff';rg.lineWidth=1;rg.globalAlpha=.55;rg.beginPath();for(const d of drops){rg.moveTo(Math.round(d.x),Math.round(d.y));rg.lineTo(Math.round(d.x-d.l*.25),Math.round(d.y+d.l));if(!reduce){d.y+=d.v;d.x-=d.v*.25;if(d.y>350){d.y=-10;d.x=Math.random()*220;}}}rg.stroke();if(!reduce)requestAnimationFrame(rain);}
 rain();
+/* 眨眼：3–6 秒随机一次，偶尔连眨两下 */
+const blinkEl=$('#blink');function blink(n=1){blinkEl.classList.add('on');setTimeout(()=>{blinkEl.classList.remove('on');if(n>1)setTimeout(()=>blink(n-1),180);},150);}
+function blinkLoop(){setTimeout(()=>{if(!document.hidden)blink(Math.random()<.25?2:1);blinkLoop();},3000+Math.random()*3000);}
+if(!reduce)blinkLoop();
 renderStatic();renderTodos();if(running())setStatus(S.mode==='focus'?'专注中…':'休息中…');
 setInterval(tick,250);document.addEventListener('visibilitychange',tick);
