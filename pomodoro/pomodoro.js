@@ -70,5 +70,14 @@ rain();
 const blinkEl=$('#blink');function blink(n=1){blinkEl.classList.add('on');setTimeout(()=>{blinkEl.classList.remove('on');if(n>1)setTimeout(()=>blink(n-1),180);},150);}
 function blinkLoop(){setTimeout(()=>{if(!document.hidden)blink(Math.random()<.25?2:1);blinkLoop();},3000+Math.random()*3000);}
 if(!reduce)blinkLoop();
+/* 写字：专注计时中才动——一阵 base/write2/base/write3，停下想一想，再继续 */
+const W2=$('#write2'),W3=$('#write3');let writeTimer=null;
+function showWrite(n){W2.classList.toggle('on',n===2);W3.classList.toggle('on',n===3);}
+const writing=()=>running()&&S.mode==='focus'&&!reduce&&!document.hidden;
+function writeLoop(){clearTimeout(writeTimer);if(!writing()){showWrite(0);writeTimer=setTimeout(writeLoop,500);return;}
+ const seq=[2,0,3,0];let i=0;const until=Date.now()+2000+Math.random()*2000;
+ (function step(){if(!writing()){showWrite(0);writeTimer=setTimeout(writeLoop,500);return;}if(Date.now()>until&&i%4===0){showWrite(0);writeTimer=setTimeout(writeLoop,1000+Math.random()*2000);return;}showWrite(seq[i++%4]);writeTimer=setTimeout(step,250+Math.random()*150);})();}
+writeLoop();
+
 renderStatic();renderTodos();if(running())setStatus(S.mode==='focus'?'专注中…':'休息中…');
 setInterval(tick,250);document.addEventListener('visibilitychange',tick);
