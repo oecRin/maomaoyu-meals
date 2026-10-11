@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>食签版式编辑器 · 猫猫鱼</title>
+<meta name="robots" content="noindex"><link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<style>
+.ed{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;max-width:1500px;margin:auto;padding:20px}
+.ed h1{font-size:28px;margin:0 0 6px}.preview{position:sticky;top:12px;align-self:start}
+#cv{width:100%;height:auto;border-radius:3px;box-shadow:0 8px 30px #33231530;touch-action:none;cursor:move}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0;font-size:14px}
+.bar input[type=text]{flex:1;min-width:160px;padding:9px;border:1px solid var(--line);background:#fffdf8;border-radius:3px}
+.bar select{padding:8px;border:1px solid var(--line);background:#fffdf8}
+.small{padding:8px 12px;font-size:13px}
+.panel{max-height:calc(100dvh - 40px);overflow:auto}
+fieldset{border:1px solid var(--line);background:#fcf8f0;margin:0 0 10px;padding:8px 12px 10px}
+fieldset.sel{border-color:var(--red);box-shadow:0 0 0 2px #a43e2d33}
+legend{font-weight:700;font-size:14px;padding:0 4px;cursor:pointer}
+.row input[type=range]{accent-color:var(--red)}.row{display:grid;grid-template-columns:104px 1fr 64px;gap:6px;align-items:center;font-size:13px;margin:4px 0}
+.row input[type=number]{width:100%;padding:4px;border:1px solid var(--line)}
+.row select,.row input[type=color]{grid-column:2/4}
+textarea{width:100%;height:160px;font:12px monospace;border:1px solid var(--line);background:#fffdf8;padding:8px}
+@media(max-width:900px){.ed{grid-template-columns:1fr}.preview{position:static}.panel{max-height:none}}
+</style>
+</head>
+<body>
+<div class="ed">
+ <section class="preview">
+  <p class="eyebrow">猫猫鱼 · 今日食签</p><h1>食签版式编辑器</h1>
+  <p class="menu-note" style="margin:0">在预览上直接拖动元素；选中后方向键微调 1px，Shift+方向键 10px。修改会自动保存在本浏览器。</p>
+  <div class="bar"><input id="dish" type="text" value="宫保鸡丁盖饭" maxlength="20" aria-label="测试菜名">
+   <button class="secondary small" data-dish="饺子">饺子</button><button class="secondary small" data-dish="辣子鸡配白米饭加煎蛋">长菜名</button>
+   <select id="meal" aria-label="餐次"><option>早餐</option><option selected>午餐</option><option>晚餐</option></select></div>
+  <canvas id="cv" width="1600" height="900" tabindex="0" aria-label="食签预览，可拖动元素"></canvas>
+  <div class="bar"><button id="export" class="primary small">导出配置</button><button id="import" class="secondary small">导入配置</button><button id="reset" class="secondary small">重置为当前默认</button><span id="msg" class="menu-note" style="margin:0"></span></div>
+  <textarea id="json" placeholder="导出的 JSON 会显示在这里；导入时把 JSON 粘贴到这里再点「导入配置」。"></textarea>
+ </section>
+ <aside class="panel" id="panel"></aside>
+</div>
+<script src="card-layout.js"></script>
+<script>
+'use strict';
+const KEY='maomaoyu-card-layout-draft',NAMES={slogan1:'标语一',slogan2:'标语二',todayEat:'今天就吃',dish:'菜名',divider:'虚线',dateLine:'日期餐次',knot:'结饰',bottomSlogan:'底部标语',mascot:'吉祥物'};
+const RANGE={x:[0,1600],y:[0,900],width:[0,1600],height:[0,900],fontSize:[10,300],fontSizeTwoLine:[10,300],lineHeight:[10,300]};
+const DEF=JSON.parse(JSON.stringify(CARD_LAYOUT));const $=s=>document.querySelector(s);
+let L=JSON.parse(JSON.stringify(DEF)),sel=null,boxes={},drag=null;
+try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(d)L=merge(d);}catch{}
+function merge(d){const o=JSON.parse(JSON.stringify(DEF));for(const k in o)if(d[k]&&typeof d[k]==='object')for(const p in o[k])if(typeof d[k][p]===typeof o[k][p])o[k][p]=d[k][p];return o;}
+const cv=$('#cv'),g=cv.getContext('2d'),bg=new Image(),ms=new Image();let fam='"Songti SC",SimSun,serif';
+bg.onload=ms.onload=()=>draw();bg.src='card-bg.webp';ms.src='mascot.webp';
+new FontFace('MaShanCard','url(fonts/mashan-full.woff2) format("woff2")').load().then(f=>{document.fonts.add(f);fam='"MaShanCard",'+fam;draw();}).catch(()=>{});
+function label(){const d=new Date();return `${d.getMonth()+1}月${d.getDate()}日  ${$('#meal').value}`;}
+function draw(){boxes=drawCardLayout(g,L,{food:$('#dish').value||' ',label:label(),family:fam,bg,mascot:ms});if(sel&&boxes[sel]){const b=boxes[sel];g.save();g.setLineDash([10,6]);g.lineWidth=3;g.strokeStyle='#1d6fd8';g.strokeRect(b.x-6,b.y-6,b.w+12,b.h+12);g.restore();}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(L));}catch{}}
+function changed(k){save();draw();syncPanel(k);}
+function build(){const p=$('#panel');p.replaceChildren();for(const k in L){const fs=document.createElement('fieldset');fs.dataset.k=k;const lg=document.createElement('legend');lg.textContent=NAMES[k]||k;lg.onclick=()=>select(k);fs.append(lg);
+ for(const prop in L[k]){const v=L[k][prop],row=document.createElement('div');row.className='row';const lab=document.createElement('label');lab.textContent=prop;row.append(lab);
+  if(prop==='align'){const s=document.createElement('select');for(const a of ['left','center','right'])s.add(new Option({left:'左对齐',center:'居中',right:'右对齐'}[a],a));s.value=v;s.dataset.p=prop;s.onchange=()=>{L[k][prop]=s.value;changed(k);};row.append(s);}
+  else if(prop==='color'||prop==='accent'){const c=document.createElement('input');c.type='color';c.value=v;c.dataset.p=prop;c.oninput=()=>{L[k][prop]=c.value;changed(k);};row.append(c);}
+  else if(typeof v==='boolean'){const c=document.createElement('input');c.type='checkbox';c.checked=v;c.dataset.p=prop;c.onchange=()=>{L[k][prop]=c.checked;changed(k);};lab.textContent='水平翻转';row.append(c);}
+  else{const [mn,mx]=RANGE[prop]||[0,1600];const r=document.createElement('input');r.type='range';r.min=mn;r.max=mx;r.value=v;r.dataset.p=prop;const n=document.createElement('input');n.type='number';n.value=v;n.dataset.p=prop;n.dataset.num=1;
+   r.oninput=()=>{L[k][prop]=+r.value;changed(k);};n.oninput=()=>{if(n.value!==''){L[k][prop]=+n.value;save();draw();r.value=n.value;}};
+   if(k==='mascot'&&(prop==='width'||prop==='height')){const old=r.oninput,old2=n.oninput;const keep=(val)=>{const ratio=ms.naturalWidth?ms.naturalWidth/ms.naturalHeight:L.mascot.width/L.mascot.height;if(prop==='width')L.mascot.height=Math.round(val/ratio);else L.mascot.width=Math.round(val*ratio);};r.oninput=()=>{L[k][prop]=+r.value;keep(+r.value);changed(k);};n.oninput=()=>{if(n.value!==''){L[k][prop]=+n.value;keep(+n.value);save();draw();syncPanel(k,n);}};}
+   row.append(r,n);}
+  fs.append(row);}
+ p.append(fs);}syncSel();}
+function syncPanel(k,skip){const fs=document.querySelector(`fieldset[data-k="${k}"]`);if(!fs)return;fs.querySelectorAll('[data-p]').forEach(el=>{if(el===skip)return;const v=L[k][el.dataset.p];if(el.type==='checkbox')el.checked=v;else el.value=v;});}
+function syncSel(){document.querySelectorAll('fieldset').forEach(f=>f.classList.toggle('sel',f.dataset.k===sel));}
+function select(k,scroll=true){sel=k;syncSel();draw();if(k&&scroll)document.querySelector(`fieldset[data-k="${k}"]`)?.scrollIntoView({block:'nearest'});}
+function pt(e){const r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)*1600/r.width,y:(e.clientY-r.top)*900/r.height};}
+function hit(p){const order=['slogan1','slogan2','todayEat','dish','divider','dateLine','knot','bottomSlogan','mascot'];for(const k of order){const b=boxes[k];if(b&&p.x>=b.x-6&&p.x<=b.x+b.w+6&&p.y>=b.y-6&&p.y<=b.y+b.h+6)return k;}return null;}
+cv.addEventListener('pointerdown',e=>{cv.focus({preventScroll:true});const p=pt(e),k=hit(p);select(k);if(k){drag={k,sx:p.x,sy:p.y,ox:L[k].x,oy:L[k].y};cv.setPointerCapture(e.pointerId);e.preventDefault();}});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pt(e);L[drag.k].x=Math.round(drag.ox+p.x-drag.sx);L[drag.k].y=Math.round(drag.oy+p.y-drag.sy);draw();syncPanel(drag.k);});
+const end=()=>{if(drag){save();drag=null;}};cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+document.addEventListener('keydown',e=>{if(!sel||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const s=e.shiftKey?10:1,d={ArrowLeft:[-s,0],ArrowRight:[s,0],ArrowUp:[0,-s],ArrowDown:[0,s]}[e.key];if(!d)return;e.preventDefault();L[sel].x+=d[0];L[sel].y+=d[1];changed(sel);});
+$('#dish').oninput=draw;$('#meal').onchange=draw;document.querySelectorAll('[data-dish]').forEach(b=>b.onclick=()=>{$('#dish').value=b.dataset.dish;draw();});
+const msg=t=>{$('#msg').textContent=t;};
+$('#export').onclick=async()=>{const t=JSON.stringify(L,null,2);$('#json').value=t;try{await navigator.clipboard.writeText(t);msg('已导出并复制到剪贴板');}catch{msg('已导出，请手动复制');}};
+$('#import').onclick=()=>{try{const d=JSON.parse($('#json').value);if(!d||typeof d!=='object')throw 0;L=merge(d);save();build();draw();msg('已导入');}catch{msg('JSON 格式不对，没能导入');}};
+$('#reset').onclick=()=>{if(!confirm('把版式恢复成网站当前默认？'))return;L=JSON.parse(JSON.stringify(DEF));localStorage.removeItem(KEY);build();draw();msg('已重置');};
+build();draw();
+</script>
+</body></html>

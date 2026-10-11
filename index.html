@@ -6,7 +6,7 @@
   <meta name="description" content="转一转木头转盘，决定今天吃什么。常见三餐菜单，也能保存自己的口味。">
   <meta name="theme-color" content="#f4eadb">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='34' r='26' fill='%23a9703d'/%3E%3Cpath d='M32 8v52M6 34h52M14 16l36 36M14 52l36-36' stroke='%23e8cba0' stroke-width='2'/%3E%3Cpath d='M25 2h14l-7 17z' fill='%23b8422c'/%3E%3Ccircle cx='32' cy='34' r='7' fill='%23e8cba0'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css"><script src="app.js" defer></script>
+  <link rel="stylesheet" href="style.css"><script src="card-layout.js" defer></script><script src="app.js" defer></script>
 </head>
 <body>
 <div class="page">
@@ -49,7 +49,7 @@
  <button class="close" id="close-card" aria-label="关闭食签">×</button><p class="eyebrow" id="card-title">猫猫鱼 · 今日食签</p>
  <div class="card-frame"><p id="card-loading">正在写食签…</p><img id="card-img" alt="" hidden></div>
  <p class="menu-note card-hint">手机上可以长按图片保存</p>
- <div class="result-buttons"><a id="save-card" class="primary card-save" download="今日食签.png" href="#">保存图片</a><button id="share-card" class="secondary" hidden>分享</button></div>
+ <div class="result-buttons"><a id="save-card" class="primary card-save" download="今日食签.jpg" href="#">保存图片</a><button id="share-card" class="secondary" hidden>分享</button></div>
 </dialog>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body></html>
