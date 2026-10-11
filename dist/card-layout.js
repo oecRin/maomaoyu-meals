@@ -3,14 +3,14 @@
    可用 /card-editor.html 可视化调整后“导出配置”，把 JSON 粘回下面的 CARD_LAYOUT。 */
 const CARD_LAYOUT = {
   slogan1:     {x:375, y:160, fontSize:34, color:'#3a2a1c', align:'left'},
-  slogan2:     {x:375, y:205, fontSize:24, color:'#3a2a1c', align:'left'},
-  todayEat:    {x:470, y:300, fontSize:80, color:'#3a2a1c', align:'center'},
-  dish:        {x:470, y:445, fontSize:110, fontSizeTwoLine:100, lineHeight:115, color:'#9e2a20', align:'center'},
-  divider:     {x:470, y:560, width:500, color:'#5a3d22'},
-  dateLine:    {x:470, y:620, fontSize:42, color:'#3a2a1c', align:'center', accent:'#9e2a20'},
-  knot:        {x:470, y:676, width:300, color:'#9e2a20'},
-  bottomSlogan:{x:540, y:740, fontSize:38, color:'#3a2a1c', align:'center'},
-  mascot:      {x:750, y:255, width:472, height:560, flipX:false}
+  slogan2:     {x:375, y:206, fontSize:27, color:'#000000', align:'left'},
+  todayEat:    {x:860, y:268, fontSize:95, color:'#000000', align:'center'},
+  dish:        {x:618, y:423, fontSize:110, fontSizeTwoLine:100, lineHeight:115, color:'#9e2a20', align:'center'},
+  divider:     {x:671, y:646, width:500, color:'#5a3d22'},
+  dateLine:    {x:1176, y:337, fontSize:42, color:'#3a2a1c', align:'center', accent:'#9e2a20'},
+  knot:        {x:775, y:709, width:300, color:'#9e2a20'},
+  bottomSlogan:{x:777, y:750, fontSize:38, color:'#3a2a1c', align:'center'},
+  mascot:      {x:951, y:386, width:336, height:399, flipX:false}
 };
 const CARD_TEXT = {slogan1:'老味道 • 好选择', slogan2:'挑食好食材 • 吃出好运气', todayEat:'今天就吃', bottomSlogan:'今日一签 • 顺心如意'};
 function splitDish(name){const a=[...name];if(a.length<=8)return [name];const t=Math.ceil(a.length/2);return [a.slice(0,t).join(''),a.slice(t).join('')];}
