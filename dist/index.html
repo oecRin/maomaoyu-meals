@@ -38,11 +38,18 @@
  <button class="close" id="close-result" aria-label="关闭结果">×</button>
  <div class="receipt"><p class="eyebrow">猫猫鱼 · 今日食签</p><p class="ticket-date" id="ticket-date"></p><div class="dashed"></div><p id="result-title">今天就吃</p><h2 id="result-food"></h2><p id="result-comment">纠结到此为止，快乐从这顿开始。</p><div class="dashed"></div><p class="ticket-bottom">宜：好好吃饭 &nbsp; 忌：饿着肚子纠结</p></div>
  <div class="result-buttons"><button id="accept" class="primary">就吃这个</button><button id="reject" class="secondary">换一个</button></div>
+ <button id="make-card" class="text-button emphasis card-link">生成食签 ✎</button>
 </dialog>
 <dialog id="edit-dialog" class="edit-dialog" aria-labelledby="edit-title">
  <button class="close" id="close-edit" aria-label="关闭菜单编辑">×</button><p class="eyebrow">按自己的口味来</p><h2 id="edit-title">我的午餐菜单</h2><p class="menu-note">修改只保存在此浏览器，不影响其他人的菜单。</p>
  <form id="add-form"><label class="sr-only" for="food-name">食物或店名</label><input id="food-name" placeholder="添加食物或店名" maxlength="20" autocomplete="off" required><button class="primary" type="submit">添加</button></form>
  <div id="edit-list" class="edit-list"></div><p class="menu-note">最多 40 项，每项最多 20 个字。修改后自动保存。</p><button id="done-edit" class="primary full">好了，去转转</button>
+</dialog>
+<dialog id="card-dialog" class="card-dialog" aria-labelledby="card-title">
+ <button class="close" id="close-card" aria-label="关闭食签">×</button><p class="eyebrow" id="card-title">猫猫鱼 · 今日食签</p>
+ <div class="card-frame"><p id="card-loading">正在写食签…</p><img id="card-img" alt="" hidden></div>
+ <p class="menu-note card-hint">手机上可以长按图片保存</p>
+ <div class="result-buttons"><a id="save-card" class="primary card-save" download="今日食签.png" href="#">保存图片</a><button id="share-card" class="secondary" hidden>分享</button></div>
 </dialog>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body></html>
