@@ -38,33 +38,21 @@ if(document.modelContext?.registerTool){const life=new AbortController();window.
 window.addEventListener('resize',()=>draw());
 
 const CARD_CHARS='0123456789•…一丁三今保凉出包午吃吉味团天头夹好如子宫家小就常庆心意拌择挑日早明晚月材条果气水油治浆炒炖烤烫焖煎牛猪番皮盖砂笼签米粉粥线老肉肠脚腿茄菜蒸蛋蛳螺豆辣运选道配酸重锅面顺食餐饨饭饺饼馄馍馒香鱼鸡麻黄';
-let cardFont=null,cardUrl=null,cardBlob=null;const mascot=new Image();
-function loadMascot(){if(mascot.complete&&mascot.naturalWidth)return Promise.resolve();return new Promise(res=>{mascot.onload=mascot.onerror=()=>res();if(!mascot.src)mascot.src='mascot.webp';});}
+let cardFont=null,cardUrl=null,cardBlob=null;const mascot=new Image(),cardBg=new Image();
+function loadImg(img,src){if(img.complete&&img.naturalWidth)return Promise.resolve();return new Promise(res=>{img.onload=img.onerror=()=>res();if(!img.src)img.src=src;});}
+function loadMascot(){return Promise.all([loadImg(mascot,'mascot.webp'),loadImg(cardBg,'card-bg.webp')]);}
 async function loadCardFont(text){const full=[...text.replace(/\s/g,"")].some(c=>!CARD_CHARS.includes(c));const want=full?'full':'subset';if(cardFont&&(cardFont==='full'||cardFont===want))return true;try{const face=new FontFace('MaShanCard',`url(fonts/mashan-${want}.woff2) format("woff2")`);await face.load();for(const f of [...document.fonts])if(f.family==='MaShanCard')document.fonts.delete(f);document.fonts.add(face);cardFont=want;return true;}catch{return !!cardFont;}}
 function cardFamily(ok){return ok?'"MaShanCard","Songti SC",SimSun,serif':'"Songti SC",SimSun,serif';}
-function drawCard(food,label,ok){const W=1600,H=900,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');const F=cardFamily(ok);
-let bg=g.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#3a2717');bg.addColorStop(1,'#25180e');g.fillStyle=bg;g.fillRect(0,0,W,H);if(wood.complete&&wood.naturalWidth){g.globalAlpha=.35;g.globalCompositeOperation='multiply';for(let x=0;x<W;x+=1000)g.drawImage(wood,x,0,1000,1000);g.globalAlpha=1;g.globalCompositeOperation='source-over';}
-const X=170,Y=66,CW=1260,CH=768;g.save();g.shadowColor='#0009';g.shadowBlur=40;g.shadowOffsetY=14;let p=g.createRadialGradient(X+CW/2,Y+CH/2,100,X+CW/2,Y+CH/2,800);p.addColorStop(0,'#efdcb8');p.addColorStop(1,'#d9bf92');g.fillStyle=p;g.fillRect(X,Y,CW,CH);g.restore();
-g.globalAlpha=.08;g.fillStyle='#6b4a22';for(let i=0;i<900;i++){g.fillRect(X+((i*7919)%CW),Y+((i*104729)%CH),2,2);}g.globalAlpha=1;
-g.strokeStyle='#5a3d22';g.lineWidth=3;g.strokeRect(X+28,Y+28,CW-56,CH-56);g.lineWidth=1.5;g.strokeRect(X+38,Y+38,CW-76,CH-76);
-for(const [cx,cy,sx,sy] of [[X+28,Y+28,1,1],[X+CW-28,Y+28,-1,1],[X+28,Y+CH-28,1,-1],[X+CW-28,Y+CH-28,-1,-1]]){g.save();g.translate(cx,cy);g.scale(sx,sy);g.lineWidth=3;g.beginPath();g.moveTo(0,46);g.lineTo(22,46);g.lineTo(22,22);g.lineTo(46,22);g.lineTo(46,0);g.moveTo(10,34);g.lineTo(34,34);g.lineTo(34,10);g.stroke();g.restore();}
-const ink='#3a2a1c',red='#9e2a20';
-// temple
-g.save();g.translate(X+90,Y+80);g.strokeStyle=ink;g.fillStyle=ink;g.lineWidth=3;g.beginPath();g.moveTo(-10,30);g.quadraticCurveTo(40,18,45,4);g.quadraticCurveTo(50,18,100,30);g.stroke();g.fillRect(14,30,62,6);for(let i=0;i<4;i++)g.fillRect(20+i*17,40,5,30);g.fillRect(4,72,82,6);g.beginPath();g.moveTo(0,46);g.quadraticCurveTo(45,36,90,46);g.stroke();g.restore();
-g.textBaseline='middle';g.fillStyle=ink;g.font=`34px ${F}`;g.fillText('老味道 • 好选择',X+215,Y+108);g.font=`24px ${F}`;g.fillText('挑食好食材 • 吃出好运气',X+215,Y+150);
-// stamp
-g.save();g.translate(X+CW-180,Y+70);g.strokeStyle=red;g.fillStyle=red;g.lineWidth=4;g.strokeRect(0,0,110,110);g.lineWidth=1.5;g.strokeRect(7,7,96,96);g.font=`44px ${F}`;g.textAlign='center';g.fillText('日',80,32);g.fillText('运',80,80);g.fillText('今',30,32);g.fillText('食',30,80);g.restore();
-const tc=X+370;g.textAlign='center';g.fillStyle=ink;g.font=`86px ${F}`;g.fillText('今天就吃',tc,Y+230);
-let size=230;g.font=`${size}px ${F}`;const maxW=500;while(g.measureText(food).width>maxW&&size>60){size-=4;g.font=`${size}px ${F}`;}g.fillStyle=red;g.save();g.shadowColor='#5e100a55';g.shadowBlur=2;g.fillText(food,tc,Y+395);g.restore();
-g.strokeStyle='#5a3d22';g.lineWidth=2;g.setLineDash([9,7]);g.beginPath();g.moveTo(tc-270,Y+505);g.lineTo(tc+270,Y+505);g.stroke();g.setLineDash([]);
-g.fillStyle=ink;g.font=`44px ${F}`;g.fillText(label,tc,Y+570);const lw=g.measureText(label).width/2+50;g.lineWidth=2;for(const s of [-1,1]){g.beginPath();g.moveTo(tc+s*lw,Y+570);g.lineTo(tc+s*(lw+110),Y+570);g.stroke();g.fillStyle=red;g.beginPath();g.arc(tc+s*(lw-18),Y+570,7,0,7);g.fill();}
-g.strokeStyle=red;g.lineWidth=3;g.beginPath();g.moveTo(tc-170,Y+635);g.lineTo(tc-30,Y+635);g.moveTo(tc+30,Y+635);g.lineTo(tc+170,Y+635);g.stroke();g.save();g.translate(tc,Y+635);g.rotate(Math.PI/4);g.strokeRect(-14,-14,28,28);g.strokeRect(-6,-6,12,12);g.restore();
-g.fillStyle=ink;g.font=`40px ${F}`;g.fillText('今日一签 • 顺心如意',tc,Y+700);
-// bowl
-g.save();g.translate(X+95,Y+CH-170);g.strokeStyle=ink;g.lineWidth=3;g.beginPath();g.ellipse(50,40,58,12,0,0,7);g.stroke();g.beginPath();g.moveTo(-8,40);g.quadraticCurveTo(0,100,50,100);g.quadraticCurveTo(100,100,108,40);g.stroke();g.strokeRect(30,100,40,8);for(const sx of [30,50,70]){g.beginPath();g.moveTo(sx,22);g.bezierCurveTo(sx-10,10,sx+10,0,sx,-14);g.stroke();}g.restore();
-// ji stamp
-g.save();g.translate(X+CW-130,Y+CH-140);g.rotate(Math.PI/4);g.strokeStyle=red;g.lineWidth=4;g.strokeRect(-46,-46,92,92);g.lineWidth=1.5;g.strokeRect(-38,-38,76,76);g.rotate(-Math.PI/4);g.fillStyle=red;g.font=`56px ${F}`;g.fillText('吉',0,3);g.restore();
-if(mascot.naturalWidth){const h=560,w=h*mascot.naturalWidth/mascot.naturalHeight;g.drawImage(mascot,X+CW-175-w,Y+CH-70-h,w,h);}
+function drawCard(food,label,ok){const W=1600,H=900,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');const F=cardFamily(ok);const ink='#3a2a1c',red='#9e2a20';
+if(cardBg.naturalWidth)g.drawImage(cardBg,0,0,W,H);else{g.fillStyle='#e6d2ae';g.fillRect(0,0,W,H);}
+g.textBaseline='middle';g.fillStyle=ink;g.font=`34px ${F}`;g.fillText('老味道 • 好选择',375,160);g.font=`24px ${F}`;g.fillText('挑食好食材 • 吃出好运气',375,205);
+const tc=500;g.textAlign='center';g.font=`80px ${F}`;g.fillText('今天就吃',tc,300);
+let size=220;g.font=`${size}px ${F}`;const maxW=480;while(g.measureText(food).width>maxW&&size>60){size-=4;g.font=`${size}px ${F}`;}g.fillStyle=red;g.save();g.shadowColor='#5e100a55';g.shadowBlur=2;g.fillText(food,tc,455);g.restore();
+g.strokeStyle='#5a3d22';g.lineWidth=2;g.setLineDash([9,7]);g.beginPath();g.moveTo(tc-250,560);g.lineTo(tc+250,560);g.stroke();g.setLineDash([]);
+g.fillStyle=ink;g.font=`42px ${F}`;g.fillText(label,tc,620);const lw=g.measureText(label).width/2+40;g.lineWidth=2;for(const s of [-1,1]){g.beginPath();g.moveTo(tc+s*lw,620);g.lineTo(tc+s*(lw+90),620);g.stroke();g.fillStyle=red;g.beginPath();g.arc(tc+s*(lw-16),620,6,0,7);g.fill();}
+g.strokeStyle=red;g.lineWidth=2.5;g.beginPath();g.moveTo(tc-150,676);g.lineTo(tc-24,676);g.moveTo(tc+24,676);g.lineTo(tc+150,676);g.stroke();g.save();g.translate(tc,676);g.rotate(Math.PI/4);g.strokeRect(-11,-11,22,22);g.strokeRect(-4,-4,8,8);g.restore();
+g.fillStyle=ink;g.font=`38px ${F}`;g.fillText('今日一签 • 顺心如意',tc+40,740);
+if(mascot.naturalWidth){const h=560,w=h*mascot.naturalWidth/mascot.naturalHeight;g.drawImage(mascot,1222-w,815-h,w,h);}
 return new Promise(res=>c.toBlob(res,'image/png'));}
 async function openCard(){if(!currentResult)return;const food=currentResult.name,d=new Date(),label=`${d.getMonth()+1}月${d.getDate()}日  ${NAMES[currentResult.meal]}`;$('#result-dialog').close();$('#card-img').hidden=true;$('#card-loading').hidden=false;$('#card-loading').textContent='正在写食签…';$('#save-card').setAttribute('aria-disabled','true');$('#share-card').hidden=true;$('#card-dialog').showModal();
 try{const [ok]=await Promise.all([loadCardFont(food+label),loadMascot()]);cardBlob=await drawCard(food,label,ok);if(!cardBlob)throw new Error();if(cardUrl)URL.revokeObjectURL(cardUrl);cardUrl=URL.createObjectURL(cardBlob);$('#card-img').src=cardUrl;$('#card-img').alt='今日食签：今天就吃'+food;$('#card-img').hidden=false;$('#card-loading').hidden=true;$('#save-card').href=cardUrl;$('#save-card').removeAttribute('aria-disabled');try{const file=new File([cardBlob],'今日食签.png',{type:'image/png'});$('#share-card').hidden=!(navigator.canShare&&navigator.canShare({files:[file]}));}catch{}}catch{$('#card-loading').textContent='食签没写成，再试一次吧。';}}
