@@ -22,6 +22,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 @keyframes steam{0%{opacity:0;transform:translateY(0) scaleX(1)}25%{opacity:.35}100%{opacity:0;transform:translateY(-120%) scaleX(1.6)}}
 .cat-breath{position:absolute;inset:0;background:url(room.webp) 0 0/100% 100%;image-rendering:pixelated;clip-path:ellipse(7.4% 6.4% at 30.4% 82.4%);transform-origin:30% 89%;animation:breath 4.2s ease-in-out infinite;pointer-events:none}
 @keyframes breath{50%{transform:scaleY(1.018) scaleX(1.006)}}
+.legs{position:absolute;left:50%;top:77.778%;width:18.75%;height:22.222%;image-rendering:pixelated;opacity:0;pointer-events:none;transition:opacity 120ms ease-in-out}.legs.on{opacity:1}
 .hand{position:absolute;left:52.8125%;top:49.3056%;width:10.625%;height:17.639%;image-rendering:pixelated;opacity:0;pointer-events:none;transition:opacity 70ms ease-in-out}.hand.on{opacity:1}
 .blink{position:absolute;left:60.781%;top:41.111%;width:9.6875%;height:7.5%;image-rendering:pixelated;opacity:0;pointer-events:none}.blink.on{opacity:1}
 .stage.break .lamp-glow{opacity:.35}.stage.break .window-tint{opacity:.45}

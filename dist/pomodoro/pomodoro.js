@@ -83,6 +83,16 @@ function writeLoop(){clearTimeout(writeTimer);if(!writing()){showPose('base');wr
   if(i>=seq.length){showPose('base');writeTimer=setTimeout(writeLoop,1000+Math.random()*2000);return;}
   const p=seq[i++];showPose(p);const t=p==='w3'?220+Math.random()*80:110+Math.random()*50;writeTimer=setTimeout(step,t);})();}
 writeLoop();
+/* 晃腿：专注计时中或休息时，一阵钟摆 base→fwd→base→back，几下后歇几秒 */
+const LEGS={};document.querySelectorAll('.legs').forEach(el=>LEGS[el.dataset.legs]=el);let legTimer=null,curLegs='base';
+function showLegs(p){if(p===curLegs)return;for(const k in LEGS)LEGS[k].classList.toggle('on',k===p);curLegs=p;}
+const swinging=()=>!reduce&&!document.hidden&&((running()&&S.mode==='focus')||S.mode!=='focus');
+function legLoop(){clearTimeout(legTimer);if(!swinging()){showLegs('base');legTimer=setTimeout(legLoop,700);return;}
+ const swings=2+Math.floor(Math.random()*3),seq=[];for(let s=0;s<swings;s++)seq.push('fwd','base','back','base');
+ let i=0;(function step(){if(!swinging()){showLegs('base');legTimer=setTimeout(legLoop,700);return;}
+  if(i>=seq.length){showLegs('base');legTimer=setTimeout(legLoop,3000+Math.random()*3000);return;}
+  const p=seq[i++];showLegs(p);legTimer=setTimeout(step,p==='base'?130+Math.random()*30:170+Math.random()*40);})();}
+legLoop();
 
 renderStatic();renderTodos();if(running())setStatus(S.mode==='focus'?'专注中…':'休息中…');
 setInterval(tick,250);document.addEventListener('visibilitychange',tick);
