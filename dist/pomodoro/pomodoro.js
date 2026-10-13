@@ -85,15 +85,16 @@ function writeLoop(){clearTimeout(writeTimer);if(!writing()){showPose('base');wr
 writeLoop();
 /* 晃腿模式：'frames' = 手绘姿势逐帧（base→midA→swingA→midA→base→back），'rotate' = 旧的绕膝旋转。
    想退回旋转版，把下面改成 'rotate' 即可。 */
-const LEG_MODE='frames';
+const LEG_MODE='draw';  // 'draw' 程序化像素腿（默认） / 'frames' 手绘姿势 / 'rotate' 绕膝旋转位图
 /* 晃腿：两条小腿各自绕膝盖摆动，一前一后交替（反相）。一个来回约 2.6 秒，
    摆几下后慢慢停住歇几秒。专注计时中或休息时才动。 */
 const LG=$('#legs'),lg=LG.getContext('2d');const LIMG={};let legsReady=0;
 const LSRC={plate:'pomodoro/legs-plate.webp',far:'pomodoro/leg-far.webp',near:'pomodoro/leg-near.webp',skirt:'pomodoro/legs-skirt.webp'};
-for(const n in LSRC){const im=new Image();im.onload=()=>{if(++legsReady===4)drawLegs(0);};im.src=LSRC[n];LIMG[n]=im;}
+for(const n in LSRC){const im=new Image();im.onload=()=>{if(++legsReady===4)renderLegs(0);};im.src=LSRC[n];LIMG[n]=im;}
 const FAR_PIVOT=[108,28],NEAR_PIVOT=[150,38],LEG_AMP=5*Math.PI/180,LEG_PERIOD=2600;
 function legSprite(im,piv,ang){lg.save();lg.translate(piv[0],piv[1]);lg.rotate(ang);lg.drawImage(im,-piv[0],-piv[1]);lg.restore();}
 function drawLegs(s){if(legsReady<4)return;lg.clearRect(0,0,250,170);lg.imageSmoothingEnabled=true;lg.drawImage(LIMG.plate,0,0);legSprite(LIMG.far,FAR_PIVOT,-s*LEG_AMP);legSprite(LIMG.near,NEAR_PIVOT,s*LEG_AMP);lg.drawImage(LIMG.skirt,0,0);}
+function renderLegs(s){if(LEG_MODE==='draw'){if(legsReady<4)return;drawLegsPixel(lg,LIMG.plate,LIMG.skirt,s,0);}else drawLegs(s);}
 const swinging=()=>!reduce&&!document.hidden&&((running()&&S.mode==='focus')||S.mode!=='focus');
 let legPhase=0,legEnv=0,legTarget=0,legLast=0,burstEnd=0,restEnd=0,legRaf=null;
 function legFrame(now){legRaf=null;const dt=Math.min(100,now-(legLast||now));legLast=now;
@@ -101,9 +102,9 @@ function legFrame(now){legRaf=null;const dt=Math.min(100,now-(legLast||now));leg
  if(!want)legTarget=0;else if(legTarget&&t>burstEnd){legTarget=0;restEnd=t+3000+Math.random()*3000;}else if(!legTarget&&t>restEnd){legTarget=1;burstEnd=t+LEG_PERIOD*(2+Math.random()*1.5);}
  legEnv+=(legTarget-legEnv)*Math.min(1,dt/700);
  if(legEnv>.002)legPhase+=dt/LEG_PERIOD*Math.PI*2;else if(!legTarget){legEnv=0;legPhase=0;}
- drawLegs(legEnv*Math.sin(legPhase));
+ renderLegs(legEnv*Math.sin(legPhase));
  if(legEnv>0||legTarget)legRaf=requestAnimationFrame(legFrame);else{legLast=0;setTimeout(()=>{if(!legRaf)legRaf=requestAnimationFrame(legFrame);},500);}}
-if(LEG_MODE==='rotate'){if(!reduce)legRaf=requestAnimationFrame(legFrame);}
+if(LEG_MODE!=='frames'){if(!reduce)legRaf=requestAnimationFrame(legFrame);window.__legState=()=>legEnv.toFixed(2)+'/'+Math.sin(legPhase).toFixed(2);}
 else{LG.style.display='none';
  const LF={};document.querySelectorAll('.legf').forEach(el=>LF[el.dataset.legf]=el);let curLF='base',lfTimer=null;
  const showLF=p=>{if(p===curLF)return;for(const k in LF)LF[k].classList.toggle('on',k===p);curLF=p;};
