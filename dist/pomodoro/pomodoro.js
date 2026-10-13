@@ -83,16 +83,24 @@ function writeLoop(){clearTimeout(writeTimer);if(!writing()){showPose('base');wr
   if(i>=seq.length){showPose('base');writeTimer=setTimeout(writeLoop,1000+Math.random()*2000);return;}
   const p=seq[i++];showPose(p);const t=p==='w3'?220+Math.random()*80:110+Math.random()*50;writeTimer=setTimeout(step,t);})();}
 writeLoop();
-/* 晃腿：专注计时中或休息时，一阵钟摆 base→fwd→base→back，几下后歇几秒 */
-const LEGS={};document.querySelectorAll('.legs').forEach(el=>LEGS[el.dataset.legs]=el);let legTimer=null,curLegs='base';
-function showLegs(p){if(p===curLegs)return;for(const k in LEGS)LEGS[k].classList.toggle('on',k===p);curLegs=p;}
+/* 晃腿：两条小腿各自绕膝盖摆动，一前一后交替（反相）。一个来回约 2.6 秒，
+   摆几下后慢慢停住歇几秒。专注计时中或休息时才动。 */
+const LG=$('#legs'),lg=LG.getContext('2d');const LIMG={};let legsReady=0;
+const LSRC={plate:'pomodoro/legs-plate.webp',far:'pomodoro/leg-far.webp',near:'pomodoro/leg-near.webp',skirt:'pomodoro/legs-skirt.webp'};
+for(const n in LSRC){const im=new Image();im.onload=()=>{if(++legsReady===4)drawLegs(0);};im.src=LSRC[n];LIMG[n]=im;}
+const FAR_PIVOT=[108,28],NEAR_PIVOT=[150,38],LEG_AMP=5*Math.PI/180,LEG_PERIOD=2600;
+function legSprite(im,piv,ang){lg.save();lg.translate(piv[0],piv[1]);lg.rotate(ang);lg.drawImage(im,-piv[0],-piv[1]);lg.restore();}
+function drawLegs(s){if(legsReady<4)return;lg.clearRect(0,0,250,170);lg.imageSmoothingEnabled=true;lg.drawImage(LIMG.plate,0,0);legSprite(LIMG.far,FAR_PIVOT,-s*LEG_AMP);legSprite(LIMG.near,NEAR_PIVOT,s*LEG_AMP);lg.drawImage(LIMG.skirt,0,0);}
 const swinging=()=>!reduce&&!document.hidden&&((running()&&S.mode==='focus')||S.mode!=='focus');
-function legLoop(){clearTimeout(legTimer);if(!swinging()){showLegs('base');legTimer=setTimeout(legLoop,700);return;}
- const swings=2+Math.floor(Math.random()*3),seq=[];for(let s=0;s<swings;s++)seq.push('fwd','base','back','base');
- let i=0;(function step(){if(!swinging()){showLegs('base');legTimer=setTimeout(legLoop,700);return;}
-  if(i>=seq.length){showLegs('base');legTimer=setTimeout(legLoop,3000+Math.random()*3000);return;}
-  const p=seq[i++];showLegs(p);legTimer=setTimeout(step,p==='base'?130+Math.random()*30:170+Math.random()*40);})();}
-legLoop();
+let legPhase=0,legEnv=0,legTarget=0,legLast=0,burstEnd=0,restEnd=0,legRaf=null;
+function legFrame(now){legRaf=null;const dt=Math.min(100,now-(legLast||now));legLast=now;
+ const want=swinging();const t=Date.now();
+ if(!want)legTarget=0;else if(legTarget&&t>burstEnd){legTarget=0;restEnd=t+3000+Math.random()*3000;}else if(!legTarget&&t>restEnd){legTarget=1;burstEnd=t+LEG_PERIOD*(2+Math.random()*1.5);}
+ legEnv+=(legTarget-legEnv)*Math.min(1,dt/700);
+ if(legEnv>.002)legPhase+=dt/LEG_PERIOD*Math.PI*2;else if(!legTarget){legEnv=0;legPhase=0;}
+ drawLegs(legEnv*Math.sin(legPhase));
+ if(legEnv>0||legTarget)legRaf=requestAnimationFrame(legFrame);else{legLast=0;setTimeout(()=>{if(!legRaf)legRaf=requestAnimationFrame(legFrame);},500);}}
+if(!reduce)legRaf=requestAnimationFrame(legFrame);
 
 renderStatic();renderTodos();if(running())setStatus(S.mode==='focus'?'专注中…':'休息中…');
 setInterval(tick,250);document.addEventListener('visibilitychange',tick);
