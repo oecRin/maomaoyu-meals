@@ -83,6 +83,9 @@ function writeLoop(){clearTimeout(writeTimer);if(!writing()){showPose('base');wr
   if(i>=seq.length){showPose('base');writeTimer=setTimeout(writeLoop,1000+Math.random()*2000);return;}
   const p=seq[i++];showPose(p);const t=p==='w3'?220+Math.random()*80:110+Math.random()*50;writeTimer=setTimeout(step,t);})();}
 writeLoop();
+/* 晃腿模式：'frames' = 手绘姿势逐帧（base→midA→swingA→midA→base→back），'rotate' = 旧的绕膝旋转。
+   想退回旋转版，把下面改成 'rotate' 即可。 */
+const LEG_MODE='frames';
 /* 晃腿：两条小腿各自绕膝盖摆动，一前一后交替（反相）。一个来回约 2.6 秒，
    摆几下后慢慢停住歇几秒。专注计时中或休息时才动。 */
 const LG=$('#legs'),lg=LG.getContext('2d');const LIMG={};let legsReady=0;
@@ -100,7 +103,18 @@ function legFrame(now){legRaf=null;const dt=Math.min(100,now-(legLast||now));leg
  if(legEnv>.002)legPhase+=dt/LEG_PERIOD*Math.PI*2;else if(!legTarget){legEnv=0;legPhase=0;}
  drawLegs(legEnv*Math.sin(legPhase));
  if(legEnv>0||legTarget)legRaf=requestAnimationFrame(legFrame);else{legLast=0;setTimeout(()=>{if(!legRaf)legRaf=requestAnimationFrame(legFrame);},500);}}
-if(!reduce)legRaf=requestAnimationFrame(legFrame);
+if(LEG_MODE==='rotate'){if(!reduce)legRaf=requestAnimationFrame(legFrame);}
+else{LG.style.display='none';
+ const LF={};document.querySelectorAll('.legf').forEach(el=>LF[el.dataset.legf]=el);let curLF='base',lfTimer=null;
+ const showLF=p=>{if(p===curLF)return;for(const k in LF)LF[k].classList.toggle('on',k===p);curLF=p;};
+ const CYCLE=['base','midA','swingA','midA','base','back'],STEP=LEG_PERIOD/CYCLE.length;
+ function lfLoop(){clearTimeout(lfTimer);if(!swinging()){showLF('base');lfTimer=setTimeout(lfLoop,700);return;}
+  const n=2+Math.floor(Math.random()*2),seq=[];for(let i=0;i<n;i++)seq.push(...CYCLE);seq.push('base');let i=0;
+  (function step(){if(!swinging()){showLF('base');lfTimer=setTimeout(lfLoop,700);return;}
+   if(i>=seq.length){lfTimer=setTimeout(lfLoop,3000+Math.random()*3000);return;}
+   const p=seq[i++];showLF(p);lfTimer=setTimeout(step,p==='swingA'?STEP*1.25:p==='base'?STEP*.85:STEP);})();}
+ if(!reduce)lfLoop();
+ window.__legState=()=>curLF;}
 
 renderStatic();renderTodos();if(running())setStatus(S.mode==='focus'?'专注中…':'休息中…');
 setInterval(tick,250);document.addEventListener('visibilitychange',tick);
