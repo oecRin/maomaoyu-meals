@@ -70,13 +70,18 @@ rain();
 const blinkEl=$('#blink');function blink(n=1){blinkEl.classList.add('on');setTimeout(()=>{blinkEl.classList.remove('on');if(n>1)setTimeout(()=>blink(n-1),180);},150);}
 function blinkLoop(){setTimeout(()=>{if(!document.hidden)blink(Math.random()<.25?2:1);blinkLoop();},3000+Math.random()*3000);}
 if(!reduce)blinkLoop();
-/* 写字：专注计时中才动——一阵 base/write2/base/write3，停下想一想，再继续 */
-const W2=$('#write2'),W3=$('#write3');let writeTimer=null;
-function showWrite(n){W2.classList.toggle('on',n===2);W3.classList.toggle('on',n===3);}
+/* 写字：专注计时中才动。笔尖顺着一行从左往右（w5→w2→base→w4），偶尔抬笔（w3）回到行首；
+   姿势之间用 70ms 透明度交叉淡入，避免硬跳。 */
+const HANDS={};document.querySelectorAll('.hand').forEach(el=>HANDS[el.dataset.pose]=el);let writeTimer=null,curPose='base';
+function showPose(p){if(p===curPose)return;for(const k in HANDS)HANDS[k].classList.toggle('on',k===p);curPose=p;}
 const writing=()=>running()&&S.mode==='focus'&&!reduce&&!document.hidden;
-function writeLoop(){clearTimeout(writeTimer);if(!writing()){showWrite(0);writeTimer=setTimeout(writeLoop,500);return;}
- const seq=[2,0,3,0];let i=0;const until=Date.now()+2000+Math.random()*2000;
- (function step(){if(!writing()){showWrite(0);writeTimer=setTimeout(writeLoop,500);return;}if(Date.now()>until&&i%4===0){showWrite(0);writeTimer=setTimeout(writeLoop,1000+Math.random()*2000);return;}showWrite(seq[i++%4]);writeTimer=setTimeout(step,250+Math.random()*150);})();}
+const LINE=['w5','w2','base','w4'],LIFT=['w3'];
+function writeLoop(){clearTimeout(writeTimer);if(!writing()){showPose('base');writeTimer=setTimeout(writeLoop,500);return;}
+ const strokes=2+Math.floor(Math.random()*3);const seq=[];
+ for(let s=0;s<strokes;s++){seq.push(...LINE);if(Math.random()<.5)seq.push('w2','w4');seq.push(...LIFT);}seq.push('w5');
+ let i=0;(function step(){if(!writing()){showPose('base');writeTimer=setTimeout(writeLoop,500);return;}
+  if(i>=seq.length){showPose('base');writeTimer=setTimeout(writeLoop,1000+Math.random()*2000);return;}
+  const p=seq[i++];showPose(p);const t=p==='w3'?220+Math.random()*80:110+Math.random()*50;writeTimer=setTimeout(step,t);})();}
 writeLoop();
 
 renderStatic();renderTodos();if(running())setStatus(S.mode==='focus'?'专注中…':'休息中…');
