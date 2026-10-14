@@ -31,7 +31,7 @@ function render(){const ms=remaining(),t=fmt(ms);$('#time').textContent=t;docume
 function renderStatic(){document.querySelectorAll('[data-mode]').forEach(b=>{const on=b.dataset.mode===S.mode;b.classList.toggle('active',on);b.setAttribute('aria-selected',on);});
  document.querySelectorAll('[data-min]').forEach(s=>s.textContent=+S.minutes[s.dataset.min].toFixed(1));
  $('#start').textContent=running()?'暂停':(S.left!==null&&S.left<total()?'继续':'开始');
- $('#stage').classList.toggle('break',S.mode!=='focus');
+ $('#stage').classList.toggle('break',S.mode!=='focus');$('#stage').classList.toggle('window',S.mode!=='focus');
  if(shownDone!==S.done){shownDone=S.done;const st=$('#stamps');st.replaceChildren();const NS='http://www.w3.org/2000/svg';for(let i=0;i<Math.min(S.done,16);i++){const s=document.createElementNS(NS,'svg'),u=document.createElementNS(NS,'use');u.setAttribute('href','#i-tomato');s.append(u);s.style.animationDelay=(i*.04)+'s';st.append(s);}if(S.done>16){const s=document.createElement('b');s.textContent='×'+S.done;st.append(s);}st.setAttribute('aria-label','今日完成 '+S.done+' 个');if(!S.done){const e=document.createElement('span');e.className='none';e.textContent='还没有，开始第一个吧';st.append(e);}}
  lastFrac=-1;render();}
 function setStatus(t){$('#status').textContent=t;}
@@ -119,3 +119,18 @@ else{LG.style.display='none';
 
 renderStatic();renderTodos();if(running())setStatus(S.mode==='focus'?'专注中…':'休息中…');
 setInterval(tick,250);document.addEventListener('visibilitychange',tick);
+
+/* 浮游光点：暖色小光斑缓慢上飘、左右轻摆、淡入淡出；休息时窗边的偏蓝 */
+(function(){const C=$('#motes');if(!C||reduce)return;const g=C.getContext('2d'),W=320,H=180,N=20;
+ const rnd=(a,b)=>a+Math.random()*(b-a);
+ const mk=(fresh)=>({x:rnd(80,320),y:fresh?rnd(20,180):rnd(150,190),vy:rnd(1.2,3.2),amp:rnd(2,7),f:rnd(.15,.45),ph:rnd(0,6.3),life:0,max:rnd(7,15),r:Math.random()<.25?2:1});
+ const ps=Array.from({length:N},()=>mk(true));ps.forEach(p=>p.life=rnd(0,p.max));let last=0;
+ function frame(t){const dt=Math.min(.1,(t-(last||t))/1000);last=t;if(document.hidden){last=0;requestAnimationFrame(frame);return;}
+  g.clearRect(0,0,W,H);const brk=$('#stage').classList.contains('break');
+  for(const p of ps){p.life+=dt;p.y-=p.vy*dt;if(p.life>p.max||p.y<-4)Object.assign(p,mk(false));
+   const x=Math.round(p.x+Math.sin(p.life*p.f*6.28+p.ph)*p.amp),y=Math.round(p.y);
+   const a=Math.sin(Math.PI*Math.min(1,p.life/p.max))*.85;const blue=brk&&p.x>250;
+   const c=blue?[150,190,255]:[255,214,140];
+   g.fillStyle=`rgba(${c},${a*.35})`;g.fillRect(x-1,y-1,p.r+2,p.r+2);g.fillStyle=`rgba(${c},${a})`;g.fillRect(x,y,p.r,p.r);}
+  requestAnimationFrame(frame);}
+ requestAnimationFrame(frame);})();
