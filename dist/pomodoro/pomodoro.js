@@ -74,7 +74,8 @@ if(!reduce)blinkLoop();
    姿势之间用 70ms 透明度交叉淡入，避免硬跳。 */
 const HANDS={};document.querySelectorAll('.hand').forEach(el=>HANDS[el.dataset.pose]=el);let writeTimer=null,curPose='base';
 function showPose(p){if(p===curPose)return;for(const k in HANDS)HANDS[k].classList.toggle('on',k===p);curPose=p;}
-const writing=()=>running()&&S.mode==='focus'&&!reduce&&!document.hidden;
+const focusAnim=()=>running()&&S.mode==='focus'&&!reduce&&!document.hidden;
+let reading=false;const writing=()=>focusAnim()&&!reading;
 const LINE=['w5','w2','base','w4'],LIFT=['w3'];
 function writeLoop(){clearTimeout(writeTimer);if(!writing()){showPose('base');writeTimer=setTimeout(writeLoop,500);return;}
  const strokes=2+Math.floor(Math.random()*3);const seq=[];
@@ -134,3 +135,30 @@ setInterval(tick,250);document.addEventListener('visibilitychange',tick);
    g.fillStyle=`rgba(${c},${a*.35})`;g.fillRect(x-1,y-1,p.r+2,p.r+2);g.fillStyle=`rgba(${c},${a})`;g.fillRect(x,y,p.r,p.r);}
   requestAnimationFrame(frame);}
  requestAnimationFrame(frame);})();
+
+/* 读书：专注时写一阵后偶尔拿起书读 15–40 秒，每 6–10 秒翻一页（代码画的纸页翻过），再回去写字。
+   ?debug=read 写 3 秒后强制一直读书（并更频繁翻页）。 */
+(function(){const st=$('#stage'),fc=$('#flick'),fg=fc.getContext('2d');
+ const DBG=new URLSearchParams(location.search).get('debug')==='read';
+ let phaseEnd=0,nextFlip=0,flipT=-1;
+ const now=()=>performance.now(),R=(a,b)=>a+Math.random()*(b-a);
+ function setReading(v){reading=v;st.classList.toggle('reading',v);}
+ // 纸页：铰链在书脊(62,62)，页尖从右页(140,42)经上方弧线翻到左页(12,28)
+ function drawFlip(p){fg.clearRect(0,0,160,70);if(p<0||p>1)return;
+  const hx=62,hy=62,a0=-0.25,a1=Math.PI+0.5,e=p<.5?2*p*p:1-2*(1-p)*(1-p),a=a0+(a1-a0)*e;
+  const L=74-16*Math.sin(Math.PI*e),tx=hx+Math.cos(a)*L,ty=hy-Math.abs(Math.sin(a))*L*0.75-Math.sin(a)*4;
+  const cx=hx+Math.cos(a+.25)*L*.55,cy=hy-Math.abs(Math.sin(a+.25))*L*.5;
+  fg.beginPath();fg.moveTo(hx,hy);fg.lineTo(cx,cy);fg.lineTo(tx,ty);fg.lineTo(hx+Math.cos(a-.12)*L*.9,hy-Math.abs(Math.sin(a-.12))*L*.68);fg.closePath();
+  fg.fillStyle=Math.cos(a)>0?'#f6e3bf':'#ead1a6';fg.fill();fg.lineWidth=2;fg.strokeStyle='#5a3a2a';fg.stroke();
+  fg.fillStyle='#fff3da';fg.fillRect(Math.round((hx+cx)/2),Math.round((hy+cy)/2),2,2);}
+ function tick(){const t=now();
+  if(!focusAnim()){if(reading)setReading(false);phaseEnd=0;flipT=-1;drawFlip(-1);}
+  else if(DBG){if(!phaseEnd)phaseEnd=t+3000;if(!reading&&t>phaseEnd){setReading(true);nextFlip=t+2500;}}
+  else if(!phaseEnd)phaseEnd=t+R(20000,45000);
+  else if(t>phaseEnd){if(reading){setReading(false);phaseEnd=t+R(25000,60000);}else{setReading(true);phaseEnd=t+R(15000,40000);nextFlip=t+R(4000,7000);}}
+  if(reading){if(flipT<0&&t>nextFlip&&t>0){flipT=t;}
+   if(flipT>=0){const p=(t-flipT)/650;drawFlip(p);if(p>1){flipT=-1;drawFlip(-1);nextFlip=t+(DBG?R(3500,5000):R(6000,10000));}}}
+  else if(flipT>=0){flipT=-1;drawFlip(-1);}
+  requestAnimationFrame(tick);}
+ // 翻页只在书完全出现后才开始（淡入 0.5s）
+ requestAnimationFrame(tick);})();
