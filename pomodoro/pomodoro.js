@@ -85,7 +85,7 @@ function writeLoop(){clearTimeout(writeTimer);if(!writing()){showPose('base');wr
 writeLoop();
 /* 晃腿模式：'frames' = 手绘姿势逐帧（base→midA→swingA→midA→base→back），'rotate' = 旧的绕膝旋转。
    想退回旋转版，把下面改成 'rotate' 即可。 */
-const LEG_MODE='draw';  // 'draw' 程序化像素腿（默认） / 'frames' 手绘姿势 / 'rotate' 绕膝旋转位图
+const LEG_MODE='rotate';  // 'draw' 程序化像素腿（默认） / 'frames' 手绘姿势 / 'rotate' 绕膝旋转位图
 /* 晃腿：两条小腿各自绕膝盖摆动，一前一后交替（反相）。一个来回约 2.6 秒，
    摆几下后慢慢停住歇几秒。专注计时中或休息时才动。 */
 const LG=$('#legs'),lg=LG.getContext('2d');const LIMG={};let legsReady=0;
