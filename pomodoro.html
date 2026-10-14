@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>番茄钟 · 猫猫鱼</title>
+<meta name="description" content="猫猫鱼的像素小书房番茄钟：专注 25 分钟，休息一下，再来一轮。">
+<meta name="theme-color" content="#2a1d14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='36' r='24' fill='%23c8392b'/%3E%3Cpath d='M22 12h20l-10 10z' fill='%235a9a3a'/%3E%3Ccircle cx='32' cy='38' r='13' fill='%23f6ead2'/%3E%3Cpath d='M32 30v8h6' stroke='%23392e25' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="pomodoro/pomodoro.css">
+<script src="pomodoro/legdraw.js" defer></script><script src="pomodoro/pomodoro.js" defer></script>
+</head>
+<body>
+<div class="stage" id="stage">
+ <div class="scene">
+ <img class="room" src="pomodoro/room.webp" alt="像素风小书房：白发女孩在台灯下写字，桌上有番茄钟和热茶，猫在垫子上睡觉，窗外下着夜雨。" width="1280" height="720">
+ <img class="room room-window" src="pomodoro/room-window.webp" alt="" aria-hidden="true" width="1280" height="720">
+ <div class="cat-breath" aria-hidden="true"></div>
+ <div class="lamp-glow" aria-hidden="true"></div>
+ <canvas class="rain" id="rain" width="192" height="350" aria-hidden="true"></canvas>
+ <div class="window-tint" aria-hidden="true"></div>
+ <div class="lights" id="lights" aria-hidden="true"></div>
+ <div class="steam" aria-hidden="true"><i></i><i></i><i></i></div>
+ <img class="legf" data-legf="midA" src="pomodoro/legf-midA.webp" alt="" aria-hidden="true">
+ <img class="legf" data-legf="swingA" src="pomodoro/legf-swingA.webp" alt="" aria-hidden="true">
+ <img class="legf" data-legf="back" src="pomodoro/legf-back.webp" alt="" aria-hidden="true">
+ <canvas class="legs" id="legs" width="250" height="170" aria-hidden="true"></canvas>
+ <img class="hand" data-pose="w2" src="pomodoro/hand-w2.webp" alt="" aria-hidden="true">
+ <img class="hand" data-pose="w3" src="pomodoro/hand-w3.webp" alt="" aria-hidden="true">
+ <img class="hand" data-pose="w4" src="pomodoro/hand-w4.webp" alt="" aria-hidden="true">
+ <img class="hand" data-pose="w5" src="pomodoro/hand-w5.webp" alt="" aria-hidden="true">
+ <img class="read" src="pomodoro/read.webp" alt="" aria-hidden="true">
+ <canvas class="flick" id="flick" width="160" height="70" aria-hidden="true"></canvas>
+ <img class="blink" id="blink" src="pomodoro/blink.webp" alt="" aria-hidden="true">
+ <canvas class="motes" id="motes" width="320" height="180" aria-hidden="true"></canvas>
+ <canvas class="tomato" id="tomato" width="56" height="56" role="img" aria-label="番茄钟进度"></canvas>
+ </div>
+
+ <section class="panel" id="panel" aria-label="番茄钟">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+   <symbol id="i-tomato" viewBox="0 0 24 24"><path d="M12 6c-5 0-9 3.2-9 8s4 8 9 8 9-3.4 9-8-4-8-9-8z" fill="#e2574c"/><path d="M7 11c.6-1.7 2-2.8 3.6-3" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".55"/><path d="M12 2.5v4M8 5.5l4 2 4-2-2.4 3.2L12 7l-1.6 1.7z" fill="#5fa14a" stroke="#5fa14a" stroke-width="1.2" stroke-linejoin="round"/></symbol>
+   <symbol id="i-paw" viewBox="0 0 24 24"><ellipse cx="12" cy="16" rx="5.2" ry="4.4"/><circle cx="5.6" cy="10.4" r="2.2"/><circle cx="9.4" cy="6.6" r="2.3"/><circle cx="14.6" cy="6.6" r="2.3"/><circle cx="18.4" cy="10.4" r="2.2"/></symbol>
+   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 1.5l2.2 7.3 7.3 3.2-7.3 3.2L12 22.5l-2.2-7.3L2.5 12l7.3-3.2z"/></symbol>
+  </svg>
+  <div class="card">
+   <i class="spark s1"><svg><use href="#i-star"/></svg></i><i class="spark s2"><svg><use href="#i-star"/></svg></i><i class="spark s3"><svg><use href="#i-star"/></svg></i>
+   <nav class="top"><a href="./" class="pill back">← 今天吃什么</a><button id="settings-btn" class="round" aria-expanded="false" aria-controls="settings" title="设置时长">⚙</button></nav>
+   <div id="settings" class="settings" hidden>
+    <p class="set-title"><svg class="ic"><use href="#i-paw"/></svg>时长（分钟）</p>
+    <label>专注<input type="number" id="set-focus" min="0.1" max="120" step="any"></label>
+    <label>短休<input type="number" id="set-short" min="0.1" max="60" step="any"></label>
+    <label>长休<input type="number" id="set-long" min="0.1" max="90" step="any"></label>
+    <p class="hint">每完成 4 个专注，休息变长休。</p>
+   </div>
+   <h1 class="title"><svg class="ic"><use href="#i-tomato"/></svg>猫猫鱼的小书房<svg class="ic paw"><use href="#i-paw"/></svg></h1>
+   <div class="modes" role="tablist" aria-label="模式">
+    <button data-mode="focus" role="tab">专注 <span data-min="focus">25</span></button><button data-mode="short" role="tab">短休 <span data-min="short">5</span></button><button data-mode="long" role="tab">长休 <span data-min="long">15</span></button>
+   </div>
+   <div class="dial">
+    <svg class="ring" viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="52"/><circle class="prog" id="ring" cx="60" cy="60" r="52" pathLength="100"/></svg>
+    <div class="dial-in"><div class="time" id="time" aria-live="off">25:00</div><p class="status" id="status" aria-live="polite">准备好就开始吧</p></div>
+   </div>
+   <div class="controls"><button id="start" class="btn primary">开始</button><button id="reset" class="btn secondary">重置</button></div>
+   <div class="today"><span class="today-label"><svg class="ic"><use href="#i-paw"/></svg>今日完成</span><span id="stamps" class="stamps" aria-label="今日完成 0 个"></span></div>
+   <div class="todo">
+    <form id="todo-form"><label class="sr-only" for="todo-input">新任务</label><input id="todo-input" placeholder="这一轮要做什么？" maxlength="40" autocomplete="off" required><button type="submit" class="btn primary add" aria-label="添加">＋</button></form>
+    <ul id="todo-list"></ul>
+   </div>
+  </div>
+ </section>
+</div>
+</body>
+</html>
