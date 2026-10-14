@@ -102,3 +102,8 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
  .panel{position:relative;width:auto;height:auto;padding:14px 14px 30px;font-size:15px}
  .card{gap:12px;padding:18px 18px 16px}.dial{width:210px}.time{font-size:48px}.today{padding-top:12px}#todo-list{overflow:visible}
 }
+.room-window{opacity:0;transition:opacity 1.5s ease-in-out}.stage.window .room-window{opacity:1}
+.hand,.blink,.legs,.legf{transition:opacity 70ms ease-in-out,visibility 0s}.stage.window .hand,.stage.window .blink,.stage.window .legs,.stage.window .legf{opacity:0!important;visibility:hidden;transition:opacity .6s,visibility 0s .6s}
+.legs{transition:opacity .6s}
+.motes{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none;mix-blend-mode:screen}
+@media(prefers-reduced-motion:reduce){.room-window{transition:none}.motes{display:none}}
