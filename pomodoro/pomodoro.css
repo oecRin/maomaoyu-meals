@@ -107,3 +107,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .legs{transition:opacity .6s}
 .motes{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none;mix-blend-mode:screen}
 @media(prefers-reduced-motion:reduce){.room-window{transition:none}.motes{display:none}}
+.read{position:absolute;left:48.0469%;top:39.5833%;width:22.6562%;height:40.2778%;image-rendering:pixelated;opacity:0;pointer-events:none;transition:opacity .5s ease-in-out}
+.flick{position:absolute;left:54.6875%;top:51.3889%;width:12.5000%;height:9.7222%;image-rendering:pixelated;pointer-events:none}
+.stage.reading .read{opacity:1}.stage.reading .hand{opacity:0!important;transition:opacity .5s}
+.stage.window .read,.stage.window .flick{opacity:0!important;transition:opacity .6s}
