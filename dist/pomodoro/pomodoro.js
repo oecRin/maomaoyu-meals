@@ -121,9 +121,9 @@ renderStatic();renderTodos();if(running())setStatus(S.mode==='focus'?'专注中�
 setInterval(tick,250);document.addEventListener('visibilitychange',tick);
 
 /* 浮游光点：暖色小光斑缓慢上飘、左右轻摆、淡入淡出；休息时窗边的偏蓝 */
-(function(){const C=$('#motes');if(!C||reduce)return;const g=C.getContext('2d'),W=320,H=180,N=20;
+(function(){const C=$('#motes');if(!C||reduce)return;const g=C.getContext('2d'),W=320,H=180,N=26;
  const rnd=(a,b)=>a+Math.random()*(b-a);
- const mk=(fresh)=>({x:rnd(80,320),y:fresh?rnd(20,180):rnd(150,190),vy:rnd(1.2,3.2),amp:rnd(2,7),f:rnd(.15,.45),ph:rnd(0,6.3),life:0,max:rnd(7,15),r:Math.random()<.25?2:1});
+ const mk=(fresh)=>({x:rnd(80,320),y:(fresh||Math.random()<.8)?rnd(4,172):rnd(150,186),vy:rnd(1.2,3.2),amp:rnd(2,7),f:rnd(.15,.45),ph:rnd(0,6.3),life:0,max:rnd(7,15),r:Math.random()<.25?2:1});
  const ps=Array.from({length:N},()=>mk(true));ps.forEach(p=>p.life=rnd(0,p.max));let last=0;
  function frame(t){const dt=Math.min(.1,(t-(last||t))/1000);last=t;if(document.hidden){last=0;requestAnimationFrame(frame);return;}
   g.clearRect(0,0,W,H);const brk=$('#stage').classList.contains('break');
