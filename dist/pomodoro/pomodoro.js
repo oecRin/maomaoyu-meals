@@ -139,6 +139,7 @@ setInterval(tick,250);document.addEventListener('visibilitychange',tick);
 /* 读书：专注时写一阵后偶尔拿起书读 15–40 秒，每 6–10 秒翻一页（代码画的纸页翻过），再回去写字。
    ?debug=read 写 3 秒后强制一直读书（并更频繁翻页）。 */
 (function(){const st=$('#stage'),fc=$('#flick'),fg=fc.getContext('2d');
+ const PAGE_FLICK=false; // 代码画翻页，用户觉得怪，先关掉；改 true 可恢复
  const DBG=new URLSearchParams(location.search).get('debug')==='read';
  let phaseEnd=0,nextFlip=0,flipT=-1;
  const now=()=>performance.now(),R=(a,b)=>a+Math.random()*(b-a);
@@ -156,7 +157,7 @@ setInterval(tick,250);document.addEventListener('visibilitychange',tick);
   else if(DBG){if(!phaseEnd)phaseEnd=t+3000;if(!reading&&t>phaseEnd){setReading(true);nextFlip=t+2500;}}
   else if(!phaseEnd)phaseEnd=t+R(20000,45000);
   else if(t>phaseEnd){if(reading){setReading(false);phaseEnd=t+R(25000,60000);}else{setReading(true);phaseEnd=t+R(15000,40000);nextFlip=t+R(4000,7000);}}
-  if(reading){if(flipT<0&&t>nextFlip&&t>0){flipT=t;}
+  if(reading&&PAGE_FLICK){if(flipT<0&&t>nextFlip&&t>0){flipT=t;}
    if(flipT>=0){const p=(t-flipT)/650;drawFlip(p);if(p>1){flipT=-1;drawFlip(-1);nextFlip=t+(DBG?R(3500,5000):R(6000,10000));}}}
   else if(flipT>=0){flipT=-1;drawFlip(-1);}
   requestAnimationFrame(tick);}
