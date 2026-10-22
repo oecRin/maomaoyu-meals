@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>猫猫鱼 2048 · 猫猫鱼.icu</title>
+<meta name="description" content="合并小鱼干，养出猫猫王！猫猫鱼的 2048 小游戏。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎮%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#c98a57">
+<link rel="stylesheet" href="games/common.css">
+<link rel="stylesheet" href="games/2048.css">
+</head>
+<body>
+<main class="wrap">
+ <nav class="topnav"><a class="pill" href="./">← 今天吃什么</a><span class="sp"></span><a class="pill" href="pomodoro.html">🍅 番茄钟</a><a class="pill here" href="2048.html" aria-current="page">🎮 2048</a><a class="pill" href="sudoku.html">🔢 数独</a></nav>
+ <section class="card">
+  <i class="corner tl"></i><i class="corner br"></i>
+  <div class="title"><img src="mascot.webp" alt="" width="58" height="69"><h1>猫猫鱼 2048<span class="ribbon">合成猫猫王</span><small>滑动合并相同的小鱼，一路养到 2048！</small></h1></div>
+  <div class="bar">
+   <div class="stat"><span>分数</span><b id="score">0</b><em id="gain" class="gain"></em></div>
+   <div class="stat"><span>最高</span><b id="best">0</b></div>
+   <span class="sp"></span>
+   <button class="btn soft" id="undo" title="撤销一步 (Z)">↶ 撤销</button>
+   <button class="btn" id="new">新游戏</button>
+  </div>
+  <div class="board" id="board" aria-label="2048 棋盘，用方向键、WASD 或滑动来移动" tabindex="0">
+   <div class="cells" aria-hidden="true"></div>
+   <div class="tiles" id="tiles"></div>
+   <div class="overlay" id="win" hidden><div class="big">👑😻</div><h2>猫猫王诞生啦！</h2><p>合成了 2048，太厉害了喵～</p><div class="row"><button class="btn" id="keep">继续玩</button><button class="btn soft" id="win-new">新游戏</button></div></div>
+   <div class="overlay" id="over" hidden><div class="big">🙀</div><h2>没地方啦</h2><p>小鱼挤满了，没有可以合并的了</p><div class="row"><button class="btn soft" id="over-undo">↶ 撤销一步</button><button class="btn" id="over-new">再来一局</button></div></div>
+  </div>
+  <ol class="ladder" id="ladder" aria-label="合成路线"></ol>
+  <p class="tip">⌨️ 方向键 / WASD　👆 手机上滑动　↶ Z 撤销一步</p>
+ </section>
+ <p class="foot">🐟 猫猫鱼.icu · 小游戏</p>
+</main>
+<script src="games/2048.js" defer></script>
+</body>
+</html>

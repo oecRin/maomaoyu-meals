@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>猫猫鱼数独 · 猫猫鱼.icu</title>
+<meta name="description" content="猫猫鱼的数独小游戏：简单、普通、困难三档，每题唯一解。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🔢%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#c98a57">
+<link rel="stylesheet" href="games/common.css">
+<link rel="stylesheet" href="games/sudoku.css">
+</head>
+<body>
+<main class="wrap">
+ <nav class="topnav"><a class="pill" href="./">← 今天吃什么</a><span class="sp"></span><a class="pill" href="pomodoro.html">🍅 番茄钟</a><a class="pill" href="2048.html">🎮 2048</a><a class="pill here" href="sudoku.html" aria-current="page">🔢 数独</a></nav>
+ <section class="card">
+  <i class="corner tl"></i><i class="corner br"></i>
+  <div class="title"><img src="mascot.webp" alt="" width="58" height="69"><h1>猫猫鱼数独<span class="ribbon">动动脑喵</span><small>每行、每列、每宫都填满 1～9，不能重复</small></h1></div>
+  <div class="diffs" role="tablist" aria-label="难度">
+   <button role="tab" data-diff="easy">🐟 简单</button><button role="tab" data-diff="medium">🐠 普通</button><button role="tab" data-diff="hard">🦈 困难</button>
+  </div>
+  <div class="bar">
+   <div class="stat"><span>用时</span><b id="time">00:00</b></div>
+   <div class="stat"><span>错误</span><b id="mistakes">0</b></div>
+   <div class="stat"><span>提示</span><b id="hints">0</b></div>
+   <span class="sp"></span>
+   <button class="btn" id="new">新游戏</button>
+  </div>
+  <div class="boardwrap">
+   <div class="sboard" id="sboard" role="grid" aria-label="数独棋盘"></div>
+   <div class="overlay" id="busy" hidden><div class="big">🐾</div><h2>正在出题…</h2><p>小猫在认真想题目喵</p></div>
+   <div class="overlay" id="win" hidden><div class="big">🎉😻</div><h2>完成啦！</h2><p id="win-msg"></p><div class="row"><button class="btn" id="win-new">再来一题</button><button class="btn soft" id="win-close">看看棋盘</button></div></div>
+  </div>
+  <div class="tools">
+   <button class="tool" id="undo" title="撤销 (Z)"><span>↶</span>撤销</button>
+   <button class="tool" id="erase" title="擦除 (Delete)"><span>🧽</span>擦除</button>
+   <button class="tool" id="notes" title="笔记 (N)" aria-pressed="false"><span>✏️</span>笔记<em id="notes-state">关</em></button>
+   <button class="tool" id="hint" title="提示 (H)"><span>💡</span>提示</button>
+  </div>
+  <div class="pad" id="pad"></div>
+  <p class="tip">⌨️ 方向键移动　1～9 填数　N 笔记　Delete 擦除　Z 撤销</p>
+ </section>
+ <p class="foot">🐟 猫猫鱼.icu · 小游戏</p>
+</main>
+<script src="games/sudoku.js" defer></script>
+</body>
+</html>
